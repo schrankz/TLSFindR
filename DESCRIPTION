@@ -1,0 +1,27 @@
+Package: TLSFindR
+Title: Tools to find and analyze tertiary lymphoid structures (TLS) in spatial transcriptomics
+Version: 0.0.0.9000
+Authors@R: 
+    person("Zachary", "Schrank", , "zachary_schrank@med.unc.edu", role = c("aut", "cre"))
+Description: Tools to identify tertiary lymphoid structures in spot-based spatial transcriptomic datasets of tissues using a K-nearest neighbor neighborhood/niche-based approach. Tissues are automatically annotated for cell type, or users can input labeled data. Cell niches are identified, and candidate TLS niches are labeled based on a user-defined B cell proportion within these niches. Niches are then scored using four transcriptional signatures of TLS used in the literature, or users can supply their own signatures. TLS are then overlaid onto a final spatial image.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+LazyData: true
+Imports:
+    Seurat,
+    SpatialExperiment,
+    celldex,
+    SingleR,
+    FNN,
+    dplyr,
+    tidyr,
+    glue,
+    ComplexHeatmap,
+    grid,
+    Matrix,
+    GSVA,
+    ggplot2,
+    reshape2,
+    tidytext
