@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="man/figures/logo.png" width="200"/>
+  <img src="man/figures/logo_v2.png" width="200"/>
 </p>
 
 <h1 align="center">TLSFindR</h1>
