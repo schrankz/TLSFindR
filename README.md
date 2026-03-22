@@ -110,8 +110,11 @@ results$plot
 ![Heatmap_Niche_Type](man/figures/RICT_heatmap_nichetype.png)
 ![Heatmap_Niche_Number](man/figures/RICT_heatmap.png)
 
+### Identified TLS Niche Image
+![TLS Niches](man/figures/RICT_niche_image.png)
+
 ### TLS Signature Scoring
-![Niche Scores](man/figures/RCTRL_niche_score_plots.png)
+![Niche Scores](man/figures/RICT_niche_score_plots.png)
 
 
 ## Bug Reports and Feature Requests:
