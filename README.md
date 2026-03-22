@@ -104,7 +104,7 @@ results$plot
 ## Example Outputs
 
 ### Neighborhood/Niche Identification
-![Niche Plot](man/figures/RICT_niche_plots.png)
+![Niche Plot](man/figures/RICT_niche_plots_v2.png)
 
 ### Niche Composition Heatmap
 ![Heatmap_Niche_Type](man/figures/RICT_heatmap_nichetype.png)
@@ -114,7 +114,7 @@ results$plot
 ![TLS Niches](man/figures/RICT_niche_image.png)
 
 ### TLS Signature Scoring
-![Niche Scores](man/figures/RICT_niche_score_plots.png)
+![Niche Scores](man/figures/RICT_niche_score_plots_v2.png)
 
 
 ## Bug Reports and Feature Requests:
