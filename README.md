@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="man/figures/logo.png" width="200"/>
+</p>
+
+<h1 align="center">TLSFindR</h1>
 # TLSFindR
 
 **TLSFindR** is an R package for identifying and characterizing B cell rich lymphoid structures, often called tertiary lymphoid structures (TLS) or tertiary lymphoid organs (organs) in spatial transcriptomic data using spatially-resolved cellular niches/neighborhoods. 
