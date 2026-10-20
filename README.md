@@ -70,7 +70,7 @@ obj <- run_annotation(obj, reference = "HumanPrimaryCellAtlasData", assay = "SCT
 bestk <- find_optimal_k(obj, assay = "SCT", group_by = "SingleR_label")
 
 # Step 3: Build neighborhoods/niches
-obj <- niche_analysis(
+obj <- run_niche_analysis(
   obj,
   optimal_k = bestk$optimal_k,
   num_neighbors = 30,
@@ -89,7 +89,23 @@ niche_summary <- summarize_niches(
   structure_label = "TLS niche"
 )
 
+# Optional: also count physically separate TLS within the TLS niche(s).
+# Structures with fewer than `min_TLS_cells` cells/spots are excluded.
+niche_summary <- summarize_niches(
+  obj,
+  cell_label = "SingleR_label",
+  niche_label = "niches",
+  Bcell_label = "B_cell",
+  B_cutoff = 0.1,
+  structure_label = "TLS niche",
+  count_TLS = TRUE,
+  min_TLS_cells = 20
+)
+niche_summary$TLS_counts    # number of TLS per image
+niche_summary$TLS_summary   # size, B cell content, and location of each TLS
+
 # Step 5: Add niche metadata to spatial object for downstream analyses
+# (adds a TLS_ID column too when count_TLS = TRUE)
 obj <- add_niche_metadata(obj, niche_summary)
 
 # Step 6: Generate heatmap of cell proportions within each niche

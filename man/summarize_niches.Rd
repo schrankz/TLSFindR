@@ -11,7 +11,12 @@ summarize_niches(
   Bcell_label,
   B_cutoff = 0.1,
   structure_label = "TLS niche",
-  max_subdominant = 1
+  max_subdominant = 1,
+  count_TLS = FALSE,
+  min_TLS_cells = 20,
+  TLS_max_dist = NULL,
+  TLS_dist_multiplier = 2,
+  image = NULL
 )
 }
 \arguments{
@@ -28,9 +33,42 @@ summarize_niches(
 \item{structure_label}{Label to call the B cell-rich niche. Default "TLS niche"}
 
 \item{max_subdominant}{Integer (0–5). Maximum number of subdominant cell types to report per niche.}
+
+\item{count_TLS}{Logical. If TRUE, count physically separate TLS structures within the
+TLS niche(s). Cells in TLS niches are linked when they lie within a linking distance of
+each other, and each separate group of linked cells is one structure. Default FALSE.}
+
+\item{min_TLS_cells}{Integer. Minimum number of cells (or spots, for spot-based data) a
+separate structure must contain to be counted as a TLS. Smaller fragments are excluded
+and reported in \code{n_fragments_excluded}. Only used when \code{count_TLS = TRUE}. Default 20.}
+
+\item{TLS_max_dist}{Numeric or NULL. Maximum distance, in the object's coordinate units,
+between two cells for them to be part of the same structure. If NULL (default), it is set
+per image to \code{TLS_dist_multiplier} times the median nearest-neighbor distance between all
+cells/spots in that image.}
+
+\item{TLS_dist_multiplier}{Numeric. Multiplier used to set the linking distance when
+\code{TLS_max_dist} is NULL. Larger values bridge bigger gaps and merge nearby structures;
+smaller values split structures at small gaps. Default 2.}
+
+\item{image}{Character vector or NULL. Image/FOV name(s) to count TLS in. If NULL
+(default), all images in the object are used, and each is counted separately.}
 }
 \value{
-A data.frame summarizing niche-level information including candidate TLS identification, dominant, and subdominant cell types and proportions.
+If \code{count_TLS = FALSE}, a data.frame summarizing niche-level information including
+candidate TLS identification, dominant, and subdominant cell types and proportions.
+
+If \code{count_TLS = TRUE}, a list with:
+\itemize{
+\item \code{niche_summary}: the niche-level data.frame described above.
+\item \code{TLS_counts}: one row per image with the number of TLS (\code{n_TLS}), the number of
+fragments below \code{min_TLS_cells} (\code{n_fragments_excluded}), and the linking distance used.
+\item \code{TLS_summary}: one row per counted TLS with its size, B cell count and proportion,
+centroid coordinates, and the niche(s) it came from.
+\item \code{TLS_cells}: the cell-to-TLS assignments (\code{cell}, \code{TLS_ID}).
+}
+This list can be passed directly to \code{add_niche_metadata()}, which will also add a
+\code{TLS_ID} metadata column.
 }
 \description{
 Summarize cell type counts and proportions per niche and classify niches based on dominant and subdominant cell type content. Candidate TLS niches are identified
@@ -42,6 +80,16 @@ summary <- summarize_niches(obj,
 cell_label = "SingleR_label", 
 niche_label = "niches", 
 Bcell_label = "B cells")
+
+# Also count physically separate TLS, keeping structures with at least 20 cells
+res <- summarize_niches(obj,
+cell_label = "SingleR_label",
+niche_label = "niches",
+Bcell_label = "B cells",
+count_TLS = TRUE,
+min_TLS_cells = 20)
+res$TLS_counts
+res$TLS_summary
 }
 
 }

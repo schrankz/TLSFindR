@@ -9,7 +9,10 @@ add_niche_metadata(obj, niche_summary)
 \arguments{
 \item{obj}{A Seurat object.}
 
-\item{niche_summary}{A data.frame returned by \code{summarize_niches()} with (at minimum) Niche and Niche_Type columns.}
+\item{niche_summary}{The output of \code{summarize_niches()}: either the niche-level data.frame
+(with at minimum Niche and Niche_Type columns), or the list returned when
+\code{count_TLS = TRUE}. In the latter case a \code{TLS_ID} column is also added, giving the
+structure each cell belongs to (NA for cells not in a counted TLS).}
 }
 \value{
 Seurat object with added metadata columns.
