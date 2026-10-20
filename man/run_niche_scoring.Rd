@@ -8,13 +8,14 @@ run_niche_scoring(
   seurat_obj,
   signatures,
   assay = c("Xenium", "SCT"),
-  slot = "data",
+  layer = "data",
   make_plot = TRUE,
   plot_type = c("bar", "dot"),
   plot_title = "TLS Signatures Per Niche",
   niche_label = "niches",
   labeled = FALSE,
-  palette = NULL
+  palette = NULL,
+  slot = NULL
 )
 }
 \arguments{
@@ -24,7 +25,7 @@ run_niche_scoring(
 
 \item{assay}{Character. Which assay to use (e.g., "Xenium" or "SCT").}
 
-\item{slot}{Character. Slot to pull from (default "data").}
+\item{layer}{Character. Layer to pull expression data from (default "data").}
 
 \item{make_plot}{Logical. Whether to return a ggplot2 object (bar or dot plot) depicting scores across niches.}
 
@@ -40,6 +41,8 @@ Either "bar" or "dot". Default is "bar".}
 \item{palette}{Optional named character vector of colors to use for niches.
 If NULL (default), ggplot2 default discrete colors are used.
 Named vectors are recommended to ensure correct color mapping.}
+
+\item{slot}{Deprecated. Use \code{layer} instead. Retained for backward compatibility.}
 }
 \value{
 A list with \code{ssgsea_results} (data.frame) and \code{plot} (ggplot or NULL).
@@ -49,7 +52,7 @@ Compute enrichment scores (ssGSEA/GSVA) for provided gene signatures on niche-ag
 }
 \examples{
 \dontrun{
-out <- run_niche_scoring(obj, human_tls_signatures, assay = "SCT", slot = "data")
+out <- run_niche_scoring(obj, human_tls_signatures, assay = "SCT", layer = "data")
 out$plot
 }
 

@@ -13,7 +13,7 @@
 #'   to `k_max` by `k_step`. If provided, this overrides the automatic calculation.
 #' @param assay Character. Assay to use for expression data. Default "SCT".
 #' @param n_features Integer. Number of highly variable features to use. Default 2000.
-#' @param slot Character. Slot to pull expression data from. Default "data".
+#' @param layer Character. Layer to pull expression data from. Default "data".
 #' @param group_by Character. Metadata column containing cell/spot type labels 
 #'   (e.g., "SingleR_label"). Required for calculating cell type mixing scores.
 #'   Default "SingleR_label".
@@ -25,6 +25,7 @@
 #'   Default 0.5 gives equal weight to coherence and mixing. Higher values (e.g., 0.7)
 #'   emphasize transcriptional similarity; lower values (e.g., 0.3) emphasize cell type
 #'   diversity.
+#' @param slot Deprecated. Use `layer` instead. Retained for backward compatibility.
 #'
 #' @return A list containing:
 #' \itemize{
@@ -122,11 +123,18 @@ find_optimal_k <- function(seurat_obj,
                            k_seq = NULL,
                            assay = "SCT",
                            n_features = 2000,
-                           slot = "data",
+                           layer = "data",
                            group_by = "SingleR_label",
                            k_max = 50,
                            k_step = 1,
-                           coherence_weight = 0.5) {
+                           coherence_weight = 0.5,
+                           slot = NULL) {
+
+  # Backward compatibility: `slot` was replaced by `layer` in Seurat v5
+  if (!is.null(slot)) {
+    warning("The `slot` argument is deprecated; please use `layer` instead.", call. = FALSE)
+    layer <- slot
+  }
   
   # Check required packages
   check_pkgs <- function(pkgs) {
@@ -169,7 +177,7 @@ find_optimal_k <- function(seurat_obj,
   }
   hvf <- head(all_hvf, n_features)
   
-  expr_data <- GetAssayData(seurat_obj, assay = assay, slot = slot)
+  expr_data <- GetAssayData(seurat_obj, assay = assay, layer = layer)
   expr_data <- as.matrix(expr_data[hvf, ])
   
   # Compute coherence and mixing scores for each k

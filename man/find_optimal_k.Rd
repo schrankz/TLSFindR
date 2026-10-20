@@ -9,11 +9,12 @@ find_optimal_k(
   k_seq = NULL,
   assay = "SCT",
   n_features = 2000,
-  slot = "data",
+  layer = "data",
   group_by = "SingleR_label",
   k_max = 50,
   k_step = 1,
-  coherence_weight = 0.5
+  coherence_weight = 0.5,
+  slot = NULL
 )
 }
 \arguments{
@@ -27,7 +28,7 @@ to \code{k_max} by \code{k_step}. If provided, this overrides the automatic calc
 
 \item{n_features}{Integer. Number of highly variable features to use. Default 2000.}
 
-\item{slot}{Character. Slot to pull expression data from. Default "data".}
+\item{layer}{Character. Layer to pull expression data from. Default "data".}
 
 \item{group_by}{Character. Metadata column containing cell/spot type labels
 (e.g., "SingleR_label"). Required for calculating cell type mixing scores.
@@ -43,6 +44,8 @@ Only used if k_seq is NULL. Default 1.}
 Default 0.5 gives equal weight to coherence and mixing. Higher values (e.g., 0.7)
 emphasize transcriptional similarity; lower values (e.g., 0.3) emphasize cell type
 diversity.}
+
+\item{slot}{Deprecated. Use \code{layer} instead. Retained for backward compatibility.}
 }
 \value{
 A list containing:

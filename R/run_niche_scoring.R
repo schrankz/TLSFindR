@@ -6,7 +6,8 @@
 #' @param seurat_obj A Seurat object.
 #' @param signatures A named list of gene vectors (signatures).
 #' @param assay Character. Which assay to use (e.g., "Xenium" or "SCT").
-#' @param slot Character. Slot to pull from (default "data").
+#' @param layer Character. Layer to pull expression data from (default "data").
+#' @param slot Deprecated. Use `layer` instead. Retained for backward compatibility.
 #' @param make_plot Logical. Whether to return a ggplot2 object (bar or dot plot) depicting scores across niches.
 #' @param plot_title Character. Title for plot.
 #' @param niche_label Character. Metadata column with niche assignments. Default "niches".
@@ -22,7 +23,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' out <- run_niche_scoring(obj, human_tls_signatures, assay = "SCT", slot = "data")
+#' out <- run_niche_scoring(obj, human_tls_signatures, assay = "SCT", layer = "data")
 #' out$plot
 #' }
 #'
@@ -40,14 +41,21 @@ run_niche_scoring <- function(
   seurat_obj,
   signatures,
   assay = c("Xenium", "SCT"),
-  slot = "data",
+  layer = "data",
   make_plot = TRUE,
   plot_type = c("bar", "dot"),
   plot_title = "TLS Signatures Per Niche",
   niche_label = "niches",# default
   labeled = FALSE,
-  palette = NULL
+  palette = NULL,
+  slot = NULL
 ) {
+
+  # Backward compatibility: `slot` was replaced by `layer` in Seurat v5
+  if (!is.null(slot)) {
+    warning("The `slot` argument is deprecated; please use `layer` instead.", call. = FALSE)
+    layer <- slot
+  }
   
   # Check if niche column exists
   if (!(niche_label %in% colnames(seurat_obj@meta.data))) {
@@ -56,7 +64,7 @@ run_niche_scoring <- function(
   
   plot_type <- match.arg(plot_type)
   
-  expr <- GetAssayData(seurat_obj, assay = assay, slot = slot)
+  expr <- GetAssayData(seurat_obj, assay = assay, layer = layer)
   # Extract clean vector of niche identifiers
   niches_vec <- seurat_obj@meta.data[[niche_label]] %>% as.character()
   niches <- unique(niches_vec)

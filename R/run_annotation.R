@@ -29,7 +29,7 @@ run_annotation <- function(seurat_obj, reference = "HumanPrimaryCellAtlasData", 
   invisible(TRUE)
 }
   check_pkgs(c("SingleR","celldex","Seurat"))
-  expr <- as.matrix(Seurat::GetAssayData(seurat_obj, assay, slot = "data"))
+  expr <- as.matrix(Seurat::GetAssayData(seurat_obj, assay = assay, layer = "data"))
   ref_fun <- switch(reference,
                     HumanPrimaryCellAtlasData = celldex::HumanPrimaryCellAtlasData,
                     BlueprintEncodeData = celldex::BlueprintEncodeData,
