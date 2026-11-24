@@ -60,7 +60,7 @@
 #'   used when `max_dist` is NULL.
 #' @param images Image names to use, or NULL for all images.
 #'
-#' @return A list with `TLS_summary`, `TLS_counts` and `TLS_cells`.
+#' @return A list with `TLS_summary`, `TLS_counts`, `TLS_cells` and `excluded_cells`.
 #' @keywords internal
 #' @noRd
 .count_tls_structures <- function(obj, tls_cells, cell_types, niches, Bcell_label,
@@ -74,6 +74,7 @@
   structure_rows <- list()
   count_rows <- list()
   cell_rows <- list()
+  excluded_rows <- list()
 
   for (img in images) {
     all_xy <- .get_image_coords(obj, img)
@@ -107,6 +108,16 @@
       kept <- as.integer(names(sizes)[sizes >= min_cells])
       n_excluded <- sum(sizes < min_cells)
 
+      # Cells in fragments too small to count as a TLS (kept for plotting)
+      small <- as.integer(names(sizes)[sizes < min_cells])
+      if (length(small) > 0) {
+        excluded_rows[[img]] <- data.frame(
+          cell = xy$cell[comp %in% small],
+          image = img,
+          stringsAsFactors = FALSE
+        )
+      }
+
       if (length(kept) > 0) {
         # Number structures from largest to smallest
         kept <- kept[order(sizes[as.character(kept)], decreasing = TRUE)]
@@ -114,9 +125,12 @@
         id_map <- stats::setNames(ids, kept)
 
         in_kept <- comp %in% kept
+        num_map <- stats::setNames(seq_along(kept), kept)
         cell_rows[[img]] <- data.frame(
           cell = xy$cell[in_kept],
+          image = img,
           TLS_ID = unname(id_map[as.character(comp[in_kept])]),
+          TLS_number = unname(num_map[as.character(comp[in_kept])]),
           stringsAsFactors = FALSE
         )
 
@@ -126,6 +140,7 @@
           n_b <- sum(cts == Bcell_label, na.rm = TRUE)
           data.frame(
             TLS_ID = ids[i],
+            TLS_number = i,
             image = img,
             n_cells = sum(sel),
             n_Bcells = n_b,
@@ -151,16 +166,21 @@
   }
 
   empty_summary <- data.frame(
-    TLS_ID = character(0), image = character(0), n_cells = integer(0),
+    TLS_ID = character(0), TLS_number = integer(0), image = character(0), n_cells = integer(0),
     n_Bcells = integer(0), Bcell_Prop = numeric(0), centroid_x = numeric(0),
     centroid_y = numeric(0), niches = character(0), stringsAsFactors = FALSE
   )
-  empty_cells <- data.frame(cell = character(0), TLS_ID = character(0),
+  empty_cells <- data.frame(cell = character(0), image = character(0),
+                            TLS_ID = character(0), TLS_number = integer(0),
                             stringsAsFactors = FALSE)
+  empty_excluded <- data.frame(cell = character(0), image = character(0),
+                               stringsAsFactors = FALSE)
 
   TLS_summary <- if (length(structure_rows)) do.call(rbind, structure_rows) else empty_summary
   TLS_cells <- if (length(cell_rows)) do.call(rbind, cell_rows) else empty_cells
+  excluded_cells <- if (length(excluded_rows)) do.call(rbind, excluded_rows) else empty_excluded
   TLS_counts <- do.call(rbind, count_rows)
+  rownames(excluded_cells) <- NULL
   rownames(TLS_summary) <- NULL
   rownames(TLS_cells) <- NULL
   rownames(TLS_counts) <- NULL
@@ -172,5 +192,6 @@
       length(missing)), call. = FALSE)
   }
 
-  list(TLS_summary = TLS_summary, TLS_counts = TLS_counts, TLS_cells = TLS_cells)
+  list(TLS_summary = TLS_summary, TLS_counts = TLS_counts, TLS_cells = TLS_cells,
+       excluded_cells = excluded_cells)
 }

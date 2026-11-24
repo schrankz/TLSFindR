@@ -11,8 +11,10 @@ add_niche_metadata(obj, niche_summary)
 
 \item{niche_summary}{The output of \code{summarize_niches()}: either the niche-level data.frame
 (with at minimum Niche and Niche_Type columns), or the list returned when
-\code{count_TLS = TRUE}. In the latter case a \code{TLS_ID} column is also added, giving the
-structure each cell belongs to (NA for cells not in a counted TLS).}
+\code{count_TLS = TRUE}. In the latter case three more columns are added:
+\code{TLS_ID} (e.g. "fov_TLS_1"; NA for cells not in a counted TLS), \code{TLS_number}
+(the TLS number within its image, 1 = largest), and \code{TLS_status}
+("Counted TLS", "Excluded fragment", or NA for cells outside TLS niches).}
 }
 \value{
 Seurat object with added metadata columns.

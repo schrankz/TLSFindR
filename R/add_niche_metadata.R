@@ -6,8 +6,10 @@
 #' @param obj A Seurat object.
 #' @param niche_summary The output of `summarize_niches()`: either the niche-level data.frame
 #'   (with at minimum Niche and Niche_Type columns), or the list returned when
-#'   `count_TLS = TRUE`. In the latter case a `TLS_ID` column is also added, giving the
-#'   structure each cell belongs to (NA for cells not in a counted TLS).
+#'   `count_TLS = TRUE`. In the latter case three more columns are added:
+#'   `TLS_ID` (e.g. "fov_TLS_1"; NA for cells not in a counted TLS), `TLS_number`
+#'   (the TLS number within its image, 1 = largest), and `TLS_status`
+#'   ("Counted TLS", "Excluded fragment", or NA for cells outside TLS niches).
 #'
 #' @return Seurat object with added metadata columns.
 #'
@@ -22,8 +24,10 @@
 add_niche_metadata <- function(obj, niche_summary){
   # Accept the list returned by summarize_niches(count_TLS = TRUE)
   tls_cells <- NULL
+  excluded_cells <- NULL
   if (is.list(niche_summary) && !is.data.frame(niche_summary)) {
     tls_cells <- niche_summary$TLS_cells
+    excluded_cells <- niche_summary$excluded_cells
     niche_summary <- niche_summary$niche_summary
   }
 
@@ -39,6 +43,22 @@ add_niche_metadata <- function(obj, niche_summary){
     tls_id <- stats::setNames(rep(NA_character_, ncol(obj)), colnames(obj))
     tls_id[tls_cells$cell] <- tls_cells$TLS_ID
     obj <- AddMetaData(obj, metadata = tls_id, col.name = "TLS_ID")
+
+    tls_num <- stats::setNames(rep(NA_integer_, ncol(obj)), colnames(obj))
+    if (!is.null(tls_cells$TLS_number)) {
+      tls_num[tls_cells$cell] <- as.integer(tls_cells$TLS_number)
+    } else {
+      # Output from an older version: recover the number from the ID
+      tls_num[tls_cells$cell] <- as.integer(sub(".*_TLS_", "", tls_cells$TLS_ID))
+    }
+    obj <- AddMetaData(obj, metadata = tls_num, col.name = "TLS_number")
+
+    tls_status <- stats::setNames(rep(NA_character_, ncol(obj)), colnames(obj))
+    if (!is.null(excluded_cells) && nrow(excluded_cells) > 0) {
+      tls_status[excluded_cells$cell] <- "Excluded fragment"
+    }
+    tls_status[tls_cells$cell] <- "Counted TLS"
+    obj <- AddMetaData(obj, metadata = tls_status, col.name = "TLS_status")
   }
 
   return(obj)

@@ -35,12 +35,15 @@
 #'     \item `niche_summary`: the niche-level data.frame described above.
 #'     \item `TLS_counts`: one row per image with the number of TLS (`n_TLS`), the number of
 #'       fragments below `min_TLS_cells` (`n_fragments_excluded`), and the linking distance used.
-#'     \item `TLS_summary`: one row per counted TLS with its size, B cell count and proportion,
-#'       centroid coordinates, and the niche(s) it came from.
-#'     \item `TLS_cells`: the cell-to-TLS assignments (`cell`, `TLS_ID`).
+#'     \item `TLS_summary`: one row per counted TLS with its ID, number, size, B cell count and
+#'       proportion, centroid coordinates, and the niche(s) it came from.
+#'     \item `TLS_cells`: the cell-to-TLS assignments (`cell`, `image`, `TLS_ID`, `TLS_number`).
+#'       TLS are numbered 1, 2, 3, ... within each image, from largest to smallest.
+#'     \item `excluded_cells`: TLS-niche cells in fragments smaller than `min_TLS_cells`
+#'       (`cell`, `image`).
 #'   }
-#'   This list can be passed directly to `add_niche_metadata()`, which will also add a
-#'   `TLS_ID` metadata column.
+#'   This list can be passed directly to `add_niche_metadata()`, which will also add
+#'   `TLS_ID`, `TLS_number` and `TLS_status` metadata columns for use in `make_niche_plot()`.
 #'
 #' @examples
 #' \dontrun{
@@ -116,14 +119,17 @@ summarize_niches <- function(
     ) %>%
     dplyr::rowwise() %>%
     dplyr::mutate(
-      Niche_Type = dplyr::case_when(
-        Dominant == Bcell_label | Bcell_Prop >= B_cutoff ~ structure_label,
-        length(Subdominant[[1]]) > 0 ~
-          glue::glue(
-            "{Dominant}-dominant; {paste(glue::glue('{Subdominant}-subdominant'), collapse = ', ')} niche"
-          ),
-        TRUE ~ glue::glue("{Dominant}-dominant niche")
-      )
+      # if/else rather than case_when: niches with a single cell type have no
+      # subdominant types, and case_when evaluated the empty branch and failed
+      Niche_Type = if (Dominant == Bcell_label || Bcell_Prop >= B_cutoff) {
+        structure_label
+      } else if (length(Subdominant) > 0) {
+        as.character(glue::glue(
+          "{Dominant}-dominant; {paste(glue::glue('{Subdominant}-subdominant'), collapse = ', ')} niche"
+        ))
+      } else {
+        as.character(glue::glue("{Dominant}-dominant niche"))
+      }
     ) %>%
     dplyr::ungroup()
 
@@ -175,6 +181,7 @@ summarize_niches <- function(
     niche_summary = niche_summary,
     TLS_counts = tls$TLS_counts,
     TLS_summary = tls$TLS_summary,
-    TLS_cells = tls$TLS_cells
+    TLS_cells = tls$TLS_cells,
+    excluded_cells = tls$excluded_cells
   )
 }

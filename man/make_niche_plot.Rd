@@ -8,30 +8,83 @@ make_niche_plot(
   obj,
   structure_label = "TLS niche",
   tissue_overlay = FALSE,
-  structure_color = "#D81B60"
+  structure_color = "#D81B60",
+  plot_mode = c("niche", "counted"),
+  show_excluded = FALSE,
+  excluded_color = "#FFC107",
+  other_color = "gray80",
+  label_TLS = FALSE,
+  label_size = 3,
+  label_color = "black",
+  label_fill = "white",
+  image = NULL,
+  pt_size = 1
 )
 }
 \arguments{
-\item{obj}{Seurat object with \code{Niche_Type} metadata.}
+\item{obj}{Seurat object with \code{Niche_Type} metadata. For \code{plot_mode = "counted"}
+or \code{label_TLS = TRUE}, also \code{TLS_number} and \code{TLS_status} metadata (added by
+\code{add_niche_metadata()} from \code{summarize_niches(count_TLS = TRUE)} output).}
 
 \item{structure_label}{Character. Label used to identify the TLS-rich niche. Default "TLS niche".}
 
 \item{tissue_overlay}{Logical. If TRUE, use SpatialDimPlot (requires histology).}
 
-\item{structure_color}{Character. Color of structure_label on spatial image. Default "#D81B60".}
+\item{structure_color}{Character. Color of the TLS niche (or counted TLS) on the spatial
+image. Default "#D81B60".}
+
+\item{plot_mode}{Character. \code{"niche"} (default) colors every cell in the TLS niche.
+\code{"counted"} colors only cells in counted TLS, i.e. structures with at least
+\code{min_TLS_cells} cells.}
+
+\item{show_excluded}{Logical. Only used when \code{plot_mode = "counted"}. If TRUE, TLS-niche
+fragments that were too small to count are shown in \code{excluded_color}; if FALSE
+(default) they are shown as "Other niches".}
+
+\item{excluded_color}{Character. Color for excluded fragments. Default "#FFC107".}
+
+\item{other_color}{Character. Color for all other cells. Default "gray80".}
+
+\item{label_TLS}{Logical. If TRUE, write each counted TLS's number at its center.
+Numbers match the \code{TLS_number} metadata column and \code{TLS_summary} table
+(1 = largest TLS in that image). Default FALSE.}
+
+\item{label_size}{Numeric. Text size of TLS number labels. Default 3.}
+
+\item{label_color}{Character. Text color of TLS number labels. Default "black".}
+
+\item{label_fill}{Character or NA. Background color of the label box, which keeps
+numbers readable on top of colored cells. Use NA for plain text. Default "white".}
+
+\item{image}{Character or NULL. Name of the image/FOV to plot. If NULL (default),
+Seurat's default image is used (all images for \code{SpatialDimPlot}).}
+
+\item{pt_size}{Numeric. Point size (\code{size} in ImageDimPlot, \code{pt.size.factor} in
+SpatialDimPlot). Default 1.}
 }
 \value{
-A ggplot object.
+A ggplot object (or a patchwork object if several images are plotted).
 }
 \description{
 Create a spatial overlay that highlights TLS candidate niches vs other niches.
+If TLS were counted with \code{summarize_niches(count_TLS = TRUE)} and added with
+\code{add_niche_metadata()}, the plot can instead show only the counted TLS, show
+fragments excluded by \code{min_TLS_cells} in a separate color, and label each TLS
+with its number.
 }
 \examples{
 \dontrun{
-niche_image <- make_niche_plot(obj, 
-structure_label = "TLS niche", 
-tissue_overlay = TRUE, 
+# Original behavior: highlight the whole TLS niche
+niche_image <- make_niche_plot(obj,
+structure_label = "TLS niche",
+tissue_overlay = TRUE,
 structure_color = "blue")
+
+# After counting: show only counted TLS, excluded fragments in yellow, numbered
+res <- summarize_niches(obj, cell_label = "SingleR_label", niche_label = "niches",
+                        Bcell_label = "B cells", count_TLS = TRUE, min_TLS_cells = 20)
+obj <- add_niche_metadata(obj, res)
+make_niche_plot(obj, plot_mode = "counted", show_excluded = TRUE, label_TLS = TRUE)
 }
 
 }

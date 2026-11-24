@@ -105,8 +105,15 @@ niche_summary$TLS_counts    # number of TLS per image
 niche_summary$TLS_summary   # size, B cell content, and location of each TLS
 
 # Step 5: Add niche metadata to spatial object for downstream analyses
-# (adds a TLS_ID column too when count_TLS = TRUE)
+# (adds TLS_ID, TLS_number and TLS_status columns too when count_TLS = TRUE)
 obj <- add_niche_metadata(obj, niche_summary)
+
+# Plot the TLS niche on the tissue (original behavior)
+make_niche_plot(obj, structure_label = "TLS niche")
+
+# Or, after counting: plot only counted TLS, show excluded fragments
+# in a separate color, and label each TLS with its number
+make_niche_plot(obj, plot_mode = "counted", show_excluded = TRUE, label_TLS = TRUE)
 
 # Step 6: Generate heatmap of cell proportions within each niche
 heatmap <- plot_niche_heatmaps(obj, niche_slot = "niches",  label_slot = 'SingleR_label', normalize_by = "row", row_fontsize = 8, column_fontsize = 8)

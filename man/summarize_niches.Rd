@@ -63,12 +63,15 @@ If \code{count_TLS = TRUE}, a list with:
 \item \code{niche_summary}: the niche-level data.frame described above.
 \item \code{TLS_counts}: one row per image with the number of TLS (\code{n_TLS}), the number of
 fragments below \code{min_TLS_cells} (\code{n_fragments_excluded}), and the linking distance used.
-\item \code{TLS_summary}: one row per counted TLS with its size, B cell count and proportion,
-centroid coordinates, and the niche(s) it came from.
-\item \code{TLS_cells}: the cell-to-TLS assignments (\code{cell}, \code{TLS_ID}).
+\item \code{TLS_summary}: one row per counted TLS with its ID, number, size, B cell count and
+proportion, centroid coordinates, and the niche(s) it came from.
+\item \code{TLS_cells}: the cell-to-TLS assignments (\code{cell}, \code{image}, \code{TLS_ID}, \code{TLS_number}).
+TLS are numbered 1, 2, 3, ... within each image, from largest to smallest.
+\item \code{excluded_cells}: TLS-niche cells in fragments smaller than \code{min_TLS_cells}
+(\code{cell}, \code{image}).
 }
-This list can be passed directly to \code{add_niche_metadata()}, which will also add a
-\code{TLS_ID} metadata column.
+This list can be passed directly to \code{add_niche_metadata()}, which will also add
+\code{TLS_ID}, \code{TLS_number} and \code{TLS_status} metadata columns for use in \code{make_niche_plot()}.
 }
 \description{
 Summarize cell type counts and proportions per niche and classify niches based on dominant and subdominant cell type content. Candidate TLS niches are identified
